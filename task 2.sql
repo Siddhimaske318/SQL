@@ -1,0 +1,111 @@
+--create table customers (customer_id  varchar ,	customer_name varchar,	city varchar,	phone_number bigint,	email varchar,	registration_date date)
+--create table orders(order_id serial primary key,	customer_id varchar ,order_date date,	order_amount int,	delivery_city varchar,	payment_mode  varchar)
+--create table products (product_id serial,	product_name varchar,	category varchar,	price int,	stock_quantity int,	supplier_name varchar,	supplier_city varchar,	supply_date date)
+--create table order_item(order_item_id serial,	order_id serial,	product_id serial,	quantity int,	total_price int)
+
+--copy customers from 'C:\Users\HP\Downloads\Table.1--customers - Table.1--customers.csv' delimiter ',' csv header;
+--copy orders from 'C:\Users\HP\Downloads\Table.2--orders - Table.2--orders.csv' delimiter ',' csv header;
+ --copy products from 'C:\Users\HP\Downloads\Table.3--products - Table.3--products.csv' delimiter ',' csv header;
+--copy order_item from 'C:\Users\HP\Downloads\Table.4--order_items - Table.4--order_items.csv' delimiter ',' csv header;
+
+--TASK 1:
+--select c.customer_name , c.city,o.order_date from  customers c join orders o on c.customer_id=o.customer_id where extract (year from o.order_date)=2023;
+--TASK 2:
+--select p.product_name,p.category,sum(oi.quantity * p.price)AS total_price from customers c join orders o on c.customer_id=o.customer_id join order_item oi on o.order_id = oi.order_id join products p on oi.product_id = p.product_id
+--where c.city = 'Mumbai' group by p.product_name,p.category order by total_price DESC;
+--TASK 3:
+--select c.customer_name,o.order_date,sum(oi.quantity * p.price)AS total_price from customers c join orders o on c.customer_id=o.customer_id join order_item oi on o.order_id=oi.order_id join products p on oi.product_id = p.product_id
+--where payment_mode = 'Credit Card' group by c.customer_name,o.order_date order by total_price DESC;
+--TASK 4:
+--select p.product_name,p.category,oi.total_price from orders o join order_item oi on o.order_id=oi.order_id join products p on oi.product_id = p.product_id
+--where o.order_date between '2023-01-01' and '2023-06-30';
+--TASK 5:
+-- select c.customer_name,count(oi.product_id)AS total_products_ordered from customers c 
+-- join orders o on c.customer_id = o.customer_id
+-- join order_item oi on o.order_id = oi.order_id group by c.customer_name order by c.customer_name;
+
+
+
+--DISTINCT
+--TASK 1 :
+-- select distinct city from customers;
+--TASK2 : 
+-- select distinct supplier_name from products;
+--TASK 3 :
+-- select distinct payment_mode from orders;
+--TASK 4 :
+-- select distinct category from products;
+--TASK 5 :
+-- select distinct city from customers;
+-- select distinct supplier_city from products;
+--ORDER BY:
+--TASK 1:
+-- select * from customers order by customer_name ASC;
+--TASK 2:
+-- select * from order_item order by total_price desc;
+--TASK 3:
+-- select *from products order by price ASC,category desc;
+--TASK 4:
+-- select order_id,customer_id,order_date from orders order by order_date desc;
+--TASK 5:
+--select c.city,count(o.order_id) as total_order from orders o join customers c on o.customer_id =c.customer_id group by c.city order by c.city ASC;
+
+--LIMIT & OFFSET
+--TASK 1:
+--select * from customers order by customer_name limit 10;
+--TASK 2 :
+--select * from products order by price desc limit 5;
+--TASK 3:
+--select * from orders order by customer_id limit 10 offset 10;
+--TASK 4:
+--select order_id,order_date,customer_id from orders by where extract(year from order_date)=2023 limit 5;
+--TASK 5:
+--select distinct delivery_city from orders limit 10 offset 10;
+
+--AGGREGATE FUNCTION
+--TASK 1:
+--select count(*)  as total_price from orders;
+--TASK 2 :
+--select sum(order_amount) as order_amount_revenue from orders where payment_mode = 'UPI';
+--TASK 3:
+--select avg(price) as average_products_price from products;
+--TASK 4:
+--select max(order_amount) as max_order_price, min(order_amount) as min_order_price from orders where extract(year from order_date)= 2023;
+--TASK 5:
+--select product_id, sum(quantity) as total_quantity from order_item group by product_id;
+
+--SET OPERATION 
+--TASK 1:
+--select customer_id from orders where extract (year from order_date) = 2022
+--Intersect
+--select customer_id from orders where extract(year from order_date)= 2023;
+--TASK 2:
+--select product_id from orders o join order_item oi on o.order_id=oi.order_id where extract(year from o.order_date)=2022
+--Except
+--select product_id from orders o join order_item oi on o.order_id=oi.order_id where extract (year from o.order_date)=2023;
+--TASK 3:
+--select supplier_city from products
+--Except
+--select city from customers;
+--TASK 4:
+--select supplier_city as city from products
+--Union
+--select city from customers;
+--TASK 5:
+--select product_name from products where product_id in (select product_id from orders o join order_item oi on o.order_id = oi.order_id where extract(year from o.order_date) =2023);
+
+--SUBQUERIES
+--TASK 1:
+--select c.customer_name from customers c join orders o on c.customer_id = o.customer_id where o.order_amount>(select avg(order_amount) from orders);
+--TASK 2:
+--select product_name from products where product_id in (select product_id from order_item group by product_id having count(*) > 1);
+--TASK 3:
+--select product_name from products where product_id in (select product_id from order_item where order_id in (
+--select order_id from orders where customer_id in (select customer_id from customers where city = 'Pune' )));
+--TASK 4:
+--select order_id, customer_id,order_amount from orders o1
+--where 3 > (Select count(*)from orders o2 where o2.order_amount > o1.order_amount);
+--TASK 5:
+--select customer_name from customers where customer_id in (select customer_id from orders where order_id in (
+--select order_id from order_item where product_id in (select product_id  from products where price > 30000)));
+
